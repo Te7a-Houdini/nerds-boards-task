@@ -17,14 +17,16 @@
             <br>
 
                 <div class="row">
+                        @foreach($questions as $question)
                         <div class="col-sm-4">
                             <div class="card">
                                 <div class="card-body">
-                                    <h5 class="card-title">Question Title</h5>
-                                    <a href="#" class="btn btn-primary">Go To Question Link</a>
+                                    <h5 class="card-title">{{$question->title}}</h5>
+                                    <a href="{{$question->link}}" target="_blank"  class="btn btn-primary">Go To Question Link</a>
                                 </div>
                             </div>
                         </div>
+                        @endforeach
 
                 </div>
         </div>
