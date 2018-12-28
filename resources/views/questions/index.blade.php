@@ -14,14 +14,15 @@
 
         <form method="POST" action="{{route('stack-overflow.questions.store')}}">
             @csrf
-            <button class="btn btn-primary" type="submit">Fetch ({{config('nerds-boards.tag')}}) Tag Questions With Answers From StackOverFlow</button>
+            <button class="btn btn-success" type="submit">Fetch ({{config('nerds-boards.tag')}}) Tag Questions With Answers From StackOverFlow</button>
         </form>
 
         <div class="container">
             <br>
 
+            @foreach($questions->split($questions->count() / 3) as $questionSet)
                 <div class="row">
-                        @foreach($questions as $question)
+                    @foreach($questionSet as $question)
                         <div class="col-sm-4">
                             <div class="card">
                                 <div class="card-body">
@@ -30,9 +31,11 @@
                                 </div>
                             </div>
                         </div>
-                        @endforeach
+                      @endforeach  
 
                 </div>
+                <br>
+            @endforeach
         </div>
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
