@@ -12,5 +12,7 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/questions');
 });
+
+Route::get('questions','QuestionController@index');
