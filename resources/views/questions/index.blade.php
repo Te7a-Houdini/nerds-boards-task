@@ -12,7 +12,11 @@
     </head>
     <body>
 
-        <a href="#" class="btn btn-primary">Fetch ({{config('nerds-boards.tag')}}) Tag Questions With Answers From StackOverFlow</a>
+        <form method="POST" action="{{route('stack-overflow.questions.store')}}">
+            @csrf
+            <button class="btn btn-primary" type="submit">Fetch ({{config('nerds-boards.tag')}}) Tag Questions With Answers From StackOverFlow</button>
+        </form>
+
         <div class="container">
             <br>
 
