@@ -16,3 +16,4 @@ Route::get('/', function () {
 });
 
 Route::get('questions','QuestionController@index');
+Route::post('stack-overflow-questions','StackOverflowQuestionController@store')->name('stack-overflow.questions.store');
