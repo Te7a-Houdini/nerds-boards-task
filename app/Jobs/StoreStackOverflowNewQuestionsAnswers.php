@@ -7,8 +7,8 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use GuzzleHttp\Client;
 use App\Answer;
+use App\StackOverflow\AnswersApi;
 
 class StoreStackOverflowNewQuestionsAnswers implements ShouldQueue
 {
@@ -33,29 +33,20 @@ class StoreStackOverflowNewQuestionsAnswers implements ShouldQueue
      */
     public function handle()
     {
-        $client = new Client([
-            'base_uri' => 'https://api.stackexchange.com/2.2/',
-        ]);
-
         $questionsIds = $this->questions->implode('question_id', ';');
+        
+        $answers = (new AnswersApi)->get(['questionsIds' => $questionsIds]);
 
- 
-        $response = $client->get('questions/' . $questionsIds .'/answers', [
-            'query' => [
-                'site' => 'stackoverflow',
-            ]
-        ]);
-
-        if ($response->getStatusCode() == 200) {
-            $answers = collect(json_decode($response->getBody()->getContents())->items)
-                        ->map(function ($answer) {
-                            return [
-                                'question_id' => $this->questions->firstWhere('question_id', $answer->question_id)->id,
-                                'answer_id' => $answer->answer_id,
-                            ];
-                        });
-
-            Answer::insert($answers->all());
+        if ($answers) {
+            Answer::insert(
+                $answers
+                    ->map(function ($answer) {
+                        return [
+                            'question_id' => $this->questions->firstWhere('question_id', $answer->question_id)->id,
+                            'answer_id' => $answer->answer_id,
+                        ];
+                    })->all()
+            );
         }
     }
 }
