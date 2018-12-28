@@ -8,10 +8,9 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use GuzzleHttp\Client;
-use function GuzzleHttp\json_encode;
 use App\Question;
 
-class StoreStackOverflowQuestionsWithAnswers implements ShouldQueue
+class StoreStackOverflowQuestions implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -42,9 +41,15 @@ class StoreStackOverflowQuestionsWithAnswers implements ShouldQueue
                                             'title' => $question->title,
                                             'link' => $question->link,
                                         ];
-                                    })->all();
+                                    });
         
-            Question::insert($newQuestions);
+            $inserted = Question::insert($newQuestions->all());
+
+            if ($inserted && $newQuestions->isNotEmpty()) {
+                StoreStackOverflowNewQuestionsAnswers::dispatch(
+                    Question::whereIn('question_id', $newQuestions->pluck('question_id'))->get()
+                );
+            }
         }
     }
 }

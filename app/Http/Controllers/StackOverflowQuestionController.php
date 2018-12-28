@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Jobs\StoreStackOverflowQuestionsWithAnswers;
+use App\Jobs\StoreStackOverflowQuestions;
 
 class StackOverflowQuestionController extends Controller
 {
     public function store()
     {
-        StoreStackOverflowQuestionsWithAnswers::dispatch();
+        StoreStackOverflowQuestions::dispatch();
         return redirect()->route('questions.index');
     }
 }
