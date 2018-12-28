@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use GuzzleHttp\Client;
 use App\Question;
+use App\StackOverflow\QuestionsApi;
 
 class StoreStackOverflowQuestions implements ShouldQueue
 {
@@ -21,28 +22,18 @@ class StoreStackOverflowQuestions implements ShouldQueue
      */
     public function handle()
     {
-        $client = new Client([
-            'base_uri' => 'https://api.stackexchange.com/2.2/',
-        ]);
+        $questions = (new QuestionsApi)->get();
 
-        $response = $client->get('questions', [
-            'query' => [
-                'site' => 'stackoverflow',
-                'tagged' => 'php',
-            ]
-        ]);
+        if ($questions) {
+            $newQuestions = $questions->whereNotIn('question_id', Question::pluck('question_id'))
+                ->map(function ($question) {
+                    return [
+                        'question_id' => $question->question_id,
+                        'title' => $question->title,
+                        'link' => $question->link,
+                    ];
+                });
 
-        if ($response->getStatusCode() == 200) {
-            $newQuestions = collect(json_decode($response->getBody()->getContents())->items)
-                                    ->whereNotIn('question_id', Question::pluck('question_id'))
-                                    ->map(function ($question) {
-                                        return [
-                                            'question_id' => $question->question_id,
-                                            'title' => $question->title,
-                                            'link' => $question->link,
-                                        ];
-                                    });
-        
             $inserted = Question::insert($newQuestions->all());
 
             if ($inserted && $newQuestions->isNotEmpty()) {
